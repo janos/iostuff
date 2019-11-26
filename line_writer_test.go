@@ -19,11 +19,41 @@ func (w *sliceWriter) Write(p []byte) (n int, err error) {
 }
 
 func TestLineWriter(t *testing.T) {
-	for _, c := range []struct {
+	type testCase struct {
 		name string
 		in   []string
 		out  []string
-	}{
+	}
+	test := func(t *testing.T, c testCase, close bool) {
+		t.Helper()
+
+		w := &sliceWriter{}
+		lw := NewLineWriter(w)
+		for _, s := range c.in {
+			n, err := lw.Write([]byte(s))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if n != len(s) {
+				t.Fatalf("expected to write %v, written %v bytes", len(s), n)
+			}
+		}
+		if close {
+			if err := lw.Close(); err != nil {
+				t.Fatal(err)
+			}
+		} else {
+			if err := lw.Flush(); err != nil {
+				t.Fatal(err)
+			}
+		}
+		for i := range c.out {
+			if c.out[i] != w.s[i] {
+				t.Errorf("expected line %v %q, got %q", i+1, c.out[i], w.s[i])
+			}
+		}
+	}
+	for _, c := range []testCase{
 		{
 			name: "blank",
 			in:   []string{""},
@@ -81,25 +111,8 @@ func TestLineWriter(t *testing.T) {
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			w := &sliceWriter{}
-			lw := NewLineWriter(w)
-			for _, s := range c.in {
-				n, err := lw.Write([]byte(s))
-				if err != nil {
-					t.Fatal(err)
-				}
-				if n != len(s) {
-					t.Fatalf("expected to write %v, written %v bytes", len(s), n)
-				}
-			}
-			if err := lw.Close(); err != nil {
-				t.Fatal(err)
-			}
-			for i := range c.out {
-				if c.out[i] != w.s[i] {
-					t.Errorf("expected line %v %q, got %q", i+1, c.out[i], w.s[i])
-				}
-			}
+			test(t, c, false)
+			test(t, c, true)
 		})
 	}
 }

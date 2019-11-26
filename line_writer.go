@@ -50,11 +50,16 @@ func (w *LineWriter) Write(p []byte) (n int, err error) {
 	return l, nil
 }
 
+// Flush writes any remaining data as a single line.
+func (w *LineWriter) Flush() error {
+	_, err := w.w.Write(w.buff)
+	return err
+}
+
 // Close flushes the buffer and closes the encapsulated
 // writer if it satisfies io.Closer interface.
 func (w *LineWriter) Close() error {
-	_, err := w.w.Write(w.buff)
-	if err != nil {
+	if err := w.Flush(); err != nil {
 		return err
 	}
 
