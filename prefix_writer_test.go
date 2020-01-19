@@ -170,7 +170,9 @@ Phasellus rhoncus tortor nec metus ullamcorper, vel maximus nisl posuere.
 		t.Run(c.name, func(t *testing.T) {
 			r := strings.NewReader(c.in)
 			buf := &bytes.Buffer{}
-			r.WriteTo(NewPrefixWriter(c.prefix, buf))
+			if _, err := r.WriteTo(NewPrefixWriter(c.prefix, buf)); err != nil {
+				t.Fatal(err)
+			}
 			if buf.String() != c.out {
 				t.Errorf("expected %q, got %q", c.out, buf.String())
 			}
