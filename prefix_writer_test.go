@@ -3,12 +3,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package iostuff
+package iostuff_test
 
 import (
 	"bytes"
 	"strings"
 	"testing"
+
+	"resenje.org/iostuff"
 )
 
 func TestPrefixWriter(t *testing.T) {
@@ -170,7 +172,7 @@ Phasellus rhoncus tortor nec metus ullamcorper, vel maximus nisl posuere.
 		t.Run(c.name, func(t *testing.T) {
 			r := strings.NewReader(c.in)
 			buf := &bytes.Buffer{}
-			if _, err := r.WriteTo(NewPrefixWriter(c.prefix, buf)); err != nil {
+			if _, err := r.WriteTo(iostuff.NewPrefixWriter(c.prefix, buf)); err != nil {
 				t.Fatal(err)
 			}
 			if buf.String() != c.out {

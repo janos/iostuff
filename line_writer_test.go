@@ -3,10 +3,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package iostuff
+package iostuff_test
 
 import (
 	"testing"
+
+	"resenje.org/iostuff"
 )
 
 type sliceWriter struct {
@@ -28,7 +30,7 @@ func TestLineWriter(t *testing.T) {
 		t.Helper()
 
 		w := &sliceWriter{}
-		lw := NewLineWriter(w)
+		lw := iostuff.NewLineWriter(w)
 		for _, s := range c.in {
 			n, err := lw.Write([]byte(s))
 			if err != nil {
